@@ -217,6 +217,17 @@ fn get_julia_path_from_channel(
                 args.as_ref().map_or_else(Vec::new, |v| v.clone()),
             ))
         }
+        JuliaupConfigChannel::AliasedChannel {
+            channel: newchannel,
+        } => {
+            return get_julia_path_from_channel(
+                versions_db,
+                config_data,
+                newchannel,
+                juliaupconfig_path,
+                juliaup_channel_source,
+            )
+        }
         JuliaupConfigChannel::SystemChannel { version } => {
             let path = &config_data
                 .installed_versions.get(version)
@@ -404,7 +415,7 @@ fn run_app() -> Result<i32> {
             }
 
             // replace the current process
-            std::process::Command::new(&julia_path)
+            let _ = std::process::Command::new(&julia_path)
                 .args(&new_args)
                 .exec();
 
